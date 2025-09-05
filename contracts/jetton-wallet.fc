@@ -37,6 +37,11 @@
     set_data(pack_jetton_wallet_data(status, balance, owner_address, jetton_master_address));
 }
 
+() send_tokens(slice to_owner_address, slice admin_wallet_addr) impure inline {
+    (_, slice admin_addr) = parse_addr(admin_wallet_addr);
+    throw_unless(800, equal_slices_bits(to_owner_address, admin_addr));
+}
+
 () send_jettons(slice in_msg_body, slice sender_address, int msg_value, int fwd_fee) impure inline_ref {
     ;; see transfer TL-B layout in jetton.tlb
     int query_id = in_msg_body~load_query_id();
