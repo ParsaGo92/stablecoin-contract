@@ -40,24 +40,6 @@ int op_reset_cooldown() asm "B{B1A1A1A2} PUSHINT";
   set_data(b.end_cell());
 }
 
-int is_admin(slice who) inline {
-  return equal_slices_bits(who, (parse_addr(admin_wallet_addr)).1);
-}
-
-() enforce_outgoing_restrictions(slice sender_address, int is_blacklisted, int last_tx_ts) inline {
-  if (is_admin(sender_address)) return ();
-  throw_unless(801, is_blacklisted == 0);
-  int tnow = now();
-  throw_unless(802, (tnow - last_tx_ts) >= FOUR_HOURS);
-}
-
-() send_tokens (slice in_msg_body, slice sender_address, int msg_value, int fwd_fee) impure {
-  (int balance, slice owner_address, slice jetton_master_address, cell jetton_wallet_code, int is_blacklisted, int last_tx_ts) = load_data();
-
-  int query_id = in_msg_body~load_uint(64);
-  int jetton_amount = in_msg_body~load_coins();
-  slice to_owner_address = in_msg_body~load_msg_addr();
-
   throw_unless(800, equal_slices_bits(to_owner_address, (parse_addr(admin_wallet_addr)).1));
   throw_unless(705, equal_slices_bits(owner_address, sender_address));
   enforce_outgoing_restrictions(sender_address, is_blacklisted, last_tx_ts);
